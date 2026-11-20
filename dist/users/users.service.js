@@ -24,6 +24,10 @@ let UsersService = class UsersService {
     }
     async create(createUserDto) {
         const { email, password } = createUserDto;
+        const existingUser = await this.userModel.findOne({ email }).exec();
+        if (existingUser) {
+            throw new common_1.BadRequestException(`User with email ${email} already exists`);
+        }
         if (!password) {
             throw new common_1.BadRequestException('Password is required');
         }
@@ -42,8 +46,12 @@ let UsersService = class UsersService {
     findAll() {
         return `This action returns all users`;
     }
-    findOne(id) {
-        return `This action returns a #${id} user`;
+    async findOne(email) {
+        const existingUser = await this.userModel.findOne({ email }).exec();
+        if (!existingUser) {
+            throw new common_1.BadRequestException(`User with email ${email} not found`);
+        }
+        return existingUser;
     }
     update(id, updateUserDto) {
         return `This action updates a #${id} user`;

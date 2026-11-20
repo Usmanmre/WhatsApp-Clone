@@ -11,7 +11,11 @@ export declare class UsersService {
         __v: number;
     }>;
     findAll(): string;
-    findOne(id: number): string;
+    findOne(email: string): Promise<import("mongoose").Document<unknown, {}, User, {}, {}> & User & {
+        _id: import("mongoose").Types.ObjectId;
+    } & {
+        __v: number;
+    }>;
     update(id: number, updateUserDto: UpdateUserDto): string;
     remove(id: number): string;
 }
