@@ -5,4 +5,4 @@ import { ConnectionRegistry } from './connection.registry';
   providers: [ConnectionRegistry],
   exports: [ConnectionRegistry],
 })
-export class RealtimeModule {}
+export class ConnectionRegistryModule {}

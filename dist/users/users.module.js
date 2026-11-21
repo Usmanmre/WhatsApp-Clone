@@ -12,19 +12,20 @@ const users_service_1 = require("./users.service");
 const users_controller_1 = require("./users.controller");
 const mongoose_1 = require("@nestjs/mongoose");
 const user_entity_1 = require("./entities/user.entity");
-const connection_registry_1 = require("../realtime/connection.registry");
+const connection_module_1 = require("../connection/connection.module");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
 exports.UsersModule = UsersModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            connection_module_1.ConnectionRegistryModule,
             mongoose_1.MongooseModule.forFeature([
                 { name: user_entity_1.User.name, schema: user_entity_1.UserSchema },
             ]),
         ],
         controllers: [users_controller_1.UsersController],
-        providers: [users_service_1.UsersService, connection_registry_1.ConnectionRegistry],
+        providers: [users_service_1.UsersService],
     })
 ], UsersModule);
 //# sourceMappingURL=users.module.js.map

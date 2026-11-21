@@ -20,11 +20,15 @@ export declare class UsersController {
             __v: number;
         };
     }>;
-    findAll(): Promise<(import("mongoose").Document<unknown, {}, import("./entities/user.entity").User, {}, {}> & import("./entities/user.entity").User & {
+    findAll(): Promise<{
+        online: boolean;
+        name: string | undefined;
+        email: string | undefined;
+        password: string | undefined;
+        avatar: string | undefined;
         _id: import("mongoose").Types.ObjectId;
-    } & {
         __v: number;
-    })[]>;
+    }[]>;
     update(id: string, updateUserDto: UpdateUserDto): string;
     remove(id: string): string;
 }

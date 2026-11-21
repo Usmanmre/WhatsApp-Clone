@@ -3,15 +3,16 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema,  } from './entities/user.entity';
-import { ConnectionRegistry } from 'src/realtime/connection.registry';
+import { ConnectionRegistryModule } from 'src/connection/connection.module';
 
 @Module({
   imports: [
+    ConnectionRegistryModule,
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
     ]),
   ],
   controllers: [UsersController],
-  providers: [UsersService, ConnectionRegistry],
+  providers: [UsersService],
 })
 export class UsersModule {}

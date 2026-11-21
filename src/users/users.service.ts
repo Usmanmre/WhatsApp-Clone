@@ -6,13 +6,14 @@ import { Model } from 'mongoose';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
-import { ConnectionRegistry } from 'src/realtime/connection.registry';
+import { ConnectionRegistry } from 'src/connection/connection.registry';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<User>,
+    private readonly connectionRegistry: ConnectionRegistry,
   ) { }
 
   async create(createUserDto: CreateUserDto) {
@@ -79,10 +80,20 @@ export class UsersService {
 
 
 
-  async findAll() {
-    const users = await this.userModel.find().exec();
-    return users;
-  }
+ async findAll() {
+  const users = await this.userModel
+    .find()
+    .select('-password')
+    .lean()
+    .exec();
+
+  const allUsers = users.map((user) => ({
+    ...user,
+    online: this.connectionRegistry.isOnline(user._id.toString()),
+  }));
+
+  return allUsers;
+}
 
   async findOne(email: string) {
 

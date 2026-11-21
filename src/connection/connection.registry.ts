@@ -15,6 +15,10 @@ export class ConnectionRegistry {
     Logger.log(`Updated sockets for user ${userId}: ${[...userSockets].join(', ')}`);
   }
 
+  get(userId: string): Set<string> | undefined {
+    return this.connections.get(userId);
+  }
+
   remove(userId: string, socketId: string) {
     const userSockets = this.connections.get(userId);
 

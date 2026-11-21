@@ -18,9 +18,11 @@ const mongoose_decorators_1 = require("@nestjs/mongoose/dist/common/mongoose.dec
 const mongoose_1 = require("mongoose");
 const user_entity_1 = require("./entities/user.entity");
 const bcrypt = require("bcrypt");
+const connection_registry_1 = require("../connection/connection.registry");
 let UsersService = class UsersService {
-    constructor(userModel) {
+    constructor(userModel, connectionRegistry) {
         this.userModel = userModel;
+        this.connectionRegistry = connectionRegistry;
     }
     async create(createUserDto) {
         const { email, password } = createUserDto;
@@ -63,8 +65,16 @@ let UsersService = class UsersService {
         };
     }
     async findAll() {
-        const users = await this.userModel.find().exec();
-        return users;
+        const users = await this.userModel
+            .find()
+            .select('-password')
+            .lean()
+            .exec();
+        const allUsers = users.map((user) => ({
+            ...user,
+            online: this.connectionRegistry.isOnline(user._id.toString()),
+        }));
+        return allUsers;
     }
     async findOne(email) {
         const existingUser = await this.userModel.findOne({ email }).exec();
@@ -84,6 +94,7 @@ exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_decorators_1.InjectModel)(user_entity_1.User.name)),
-    __metadata("design:paramtypes", [mongoose_1.Model])
+    __metadata("design:paramtypes", [mongoose_1.Model,
+        connection_registry_1.ConnectionRegistry])
 ], UsersService);
 //# sourceMappingURL=users.service.js.map
