@@ -1,10 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose/dist/common/mongoose.decorators';
 import { Model } from 'mongoose';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { LoginUserDto } from './dto/login-user.dto';
+import { ConnectionRegistry } from 'src/realtime/connection.registry';
 
 @Injectable()
 export class UsersService {
@@ -16,7 +18,7 @@ export class UsersService {
   async create(createUserDto: CreateUserDto) {
     const { email, password } = createUserDto;
 
-   const existingUser = await this.userModel.findOne({ email }).exec();
+    const existingUser = await this.userModel.findOne({ email }).exec();
     if (existingUser) {
       throw new BadRequestException(`User with email ${email} already exists`);
     }
@@ -43,16 +45,51 @@ export class UsersService {
     return user;
   }
 
-  findAll() {
-    return `This action returns all users`;
+
+  async login(loginUserDto: LoginUserDto) {
+  const { email, password } = loginUserDto;
+ if (!email || !password) {
+    throw new BadRequestException('Email and password are required');
+  }
+  // Find user and explicitly include password
+  const existingUser = await this.userModel
+    .findOne({ email: email .trim().toLowerCase() })
+    .exec();
+
+  // Generic error prevents email enumeration
+  if (!existingUser || !existingUser.password) {
+    throw new UnauthorizedException('Invalid email or password');
   }
 
- async findOne(email: string) {
-     
-  const existingUser = await this.userModel.findOne({ email }).exec();
-  if (!existingUser) {
-    throw new BadRequestException(`User with email ${email} not found`);
+  // Verify password
+  const isMatch = await bcrypt.compare(
+    password,
+    existingUser.password,
+  );
+
+  if (!isMatch) {
+    throw new UnauthorizedException('Invalid email or password');
   }
+
+  // Return safe user data
+  return {
+    user: { ...existingUser.toObject() },
+  };
+}
+
+
+
+  async findAll() {
+    const users = await this.userModel.find().exec();
+    return users;
+  }
+
+  async findOne(email: string) {
+
+    const existingUser = await this.userModel.findOne({ email }).exec();
+    if (!existingUser) {
+      throw new BadRequestException(`User with email ${email} not found`);
+    }
     return existingUser;
   }
 

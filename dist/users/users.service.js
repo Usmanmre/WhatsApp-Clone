@@ -43,8 +43,28 @@ let UsersService = class UsersService {
         });
         return user;
     }
-    findAll() {
-        return `This action returns all users`;
+    async login(loginUserDto) {
+        const { email, password } = loginUserDto;
+        if (!email || !password) {
+            throw new common_1.BadRequestException('Email and password are required');
+        }
+        const existingUser = await this.userModel
+            .findOne({ email: email.trim().toLowerCase() })
+            .exec();
+        if (!existingUser || !existingUser.password) {
+            throw new common_1.UnauthorizedException('Invalid email or password');
+        }
+        const isMatch = await bcrypt.compare(password, existingUser.password);
+        if (!isMatch) {
+            throw new common_1.UnauthorizedException('Invalid email or password');
+        }
+        return {
+            user: { ...existingUser.toObject() },
+        };
+    }
+    async findAll() {
+        const users = await this.userModel.find().exec();
+        return users;
     }
     async findOne(email) {
         const existingUser = await this.userModel.findOne({ email }).exec();

@@ -5,6 +5,12 @@ const app_module_1 = require("./app/app.module");
 const common_1 = require("@nestjs/common");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    app.enableCors({
+        origin: 'http://localhost:5173',
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        credentials: true,
+        allowedHeaders: ['Content-Type', 'Authorization'],
+    });
     const port = Number(process.env.PORT) || 3000;
     await app.listen(port);
     common_1.Logger.log(`Server is running on http://localhost:${port}`);

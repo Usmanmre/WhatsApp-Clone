@@ -2,6 +2,7 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
+import { ChatModule } from 'src/chat/chat.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from 'src/users/users.module';
@@ -34,6 +35,7 @@ import { UsersModule } from 'src/users/users.module';
       },
     }),
     UsersModule, // Ensure UsersModule is imported here
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],

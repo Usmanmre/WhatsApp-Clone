@@ -24,7 +24,7 @@ export class User {
   @Prop({
     required: true,
     type: String,
-    select: false,
+    select: true,
   })
   password: string | undefined;
 
